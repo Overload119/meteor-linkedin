@@ -65,31 +65,15 @@ var isJSON = function (str) {
 // returns an object containing:
 // - accessToken
 // - expiresIn: lifetime of token in seconds
-var getTokenResponse = function (query) {
+var getTokenResponse = function(query) {
   var config = ServiceConfiguration.configurations.findOne({service: 'linkedin'});
   if (!config)
     throw new ServiceConfiguration.ConfigError("Service not configured");
 
   var responseContent;
   try {
-
-    // Request an access token
-    // responseContent = Meteor.http.post(
-    //   "https://api.linkedin.com/uas/oauth2/accessToken", {
-    //     params: {
-    //       grant_type: 'authorization_code',
-    //       client_id: config.clientId,
-    //       client_secret: config.secret,
-    //       code: query.code,
-    //       redirect_uri: Meteor.absoluteUrl("_oauth/linkedin?close")
-    //     }
-    //   }).content;
-
-// fallback to old school
     responseContent = Meteor.http.post(
-      "https://api.linkedin.com/uas/oauth2/accessToken?grant_type=authorization_code&code=" + query.code + "&redirect_uri=" + Meteor.absoluteUrl("_oauth/linkedin?close") + "&client_id=" + config.clientId + "&client_secret=" + config.secret
-
-     ).content;
+      "https://api.linkedin.com/uas/oauth2/accessToken?grant_type=authorization_code&code=" + query.code + "&redirect_uri=" + Meteor.absoluteUrl("_oauth/linkedin?requestTokenAndRedirect=true") + "&client_id=" + config.clientId + "&client_secret=" + config.secret).content;
   } catch (err) {
     throw new Error("Failed to complete OAuth handshake with LinkedIn. " + err.message);
   }
